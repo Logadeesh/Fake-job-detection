@@ -48,6 +48,12 @@ It is built using:
   - `fake_job_model.pkl`
   - `tfidf_vectorizer.pkl`
 
+## ⚠️ Note
+Large files such as model (.pkl), dataset (.csv), and database (.db) are excluded due to GitHub size limits.
+
+To regenerate:
+1. Run Feature_pipeline.py
+2. This will create model files locally
 ---
 
 ### 🔹 Milestone 3: Backend (Flask API)
