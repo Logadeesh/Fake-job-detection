@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JobShield AI — Fake Job Detector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">
+      <span class="logo-shield">⬡</span>
+      JobShield<span class="logo-ai">AI</span>
+    </div>
+    <div class="header-meta">
+      <span class="pill pill-green">Model Active</span>
+      <span class="pill pill-mono">Logistic Regression · TF-IDF</span>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <p class="hero-eyebrow">Milestone 1 + 2 · NLP Pipeline</p>
+    <h1>Detect Fake<br><em>Job Postings</em></h1>
+    <p class="hero-sub">Paste any job description. Your trained model — built with text cleaning, stopword removal, lemmatization, TF-IDF vectorization, and logistic regression — will analyze it instantly.</p>
+
+    <!-- pipeline badges -->
+    <div class="pipeline">
+      <div class="pipe-step">
+        <span class="pipe-num">01</span>
+        <span class="pipe-label">Regex Clean</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="pipe-num">02</span>
+        <span class="pipe-label">Stopwords</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="pipe-num">03</span>
+        <span class="pipe-label">Lemmatize</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="pipe-num">04</span>
+        <span class="pipe-label">TF-IDF</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step active">
+        <span class="pipe-num">05</span>
+        <span class="pipe-label">Predict</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MAIN CARD ── -->
+  <main>
+    <div class="card" id="analyzeCard">
+      <div class="card-header">
+        <span class="card-label">Job Description</span>
+        <span class="char-count" id="charCount">0 / 5000</span>
+      </div>
+
+      <div class="textarea-wrap">
+        <textarea
+          id="description"
+          maxlength="5000"
+          placeholder="Paste the full job description here — title, responsibilities, requirements, salary, company info. The more text, the more accurate the analysis."
+          oninput="onType()"
+          spellcheck="false"
+        ></textarea>
+        <div class="textarea-glow" id="textareaGlow"></div>
+      </div>
+
+      <div class="card-footer">
+        <p class="hint-text" id="hintText">Minimum 20 words recommended for accurate prediction.</p>
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeJob()">
+          <span class="btn-text">Analyze Job Post</span>
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 9l2.5 2.5L13 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── RESULT AREA ── -->
+    <div id="resultArea" class="result-area hidden">
+
+      <!-- verdict -->
+      <div class="verdict-card" id="verdictCard">
+        <div class="verdict-left">
+          <div class="verdict-icon" id="verdictIcon"></div>
+          <div>
+            <h2 class="verdict-title" id="verdictTitle"></h2>
+            <p class="verdict-sub" id="verdictSub"></p>
+          </div>
+        </div>
+        <div class="verdict-badge" id="verdictBadge"></div>
+      </div>
+
+      <!-- risk meter -->
+      <div class="meter-card">
+        <div class="meter-header">
+          <span class="meter-label">Fake Risk Score</span>
+          <span class="meter-val" id="meterVal">0%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-fill" id="meterFill"></div>
+        </div>
+        <div class="meter-legend">
+          <span>Low Risk</span>
+          <span>Medium</span>
+          <span>High Risk</span>
+        </div>
+      </div>
+
+      <!-- stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val" id="statFakeProb">—</div>
+          <div class="stat-label">Fake Probability</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statRealProb">—</div>
+          <div class="stat-label">Real Probability</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statWords">—</div>
+          <div class="stat-label">Words Analyzed</div>
+        </div>
+      </div>
+
+      <!-- keywords -->
+      <div class="keywords-section" id="keywordsSection"></div>
+
+      <!-- cleaned text preview -->
+      <div class="preview-card" id="previewCard"></div>
+
+      <!-- actions -->
+      <div class="result-actions">
+        <button class="reset-btn" onclick="resetForm()">← Analyze another</button>
+        <button class="history-btn" onclick="loadHistory()">View DB History</button>
+      </div>
+    </div>
+
+    <!-- ── HISTORY PANEL ── -->
+    <div id="historyPanel" class="history-panel hidden">
+      <div class="history-header">
+        <h3>SQLite Database — Recent Analyses</h3>
+        <button class="close-btn" onclick="closeHistory()">✕</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <!-- ── MODEL STATS ── -->
+    <div class="model-info" id="modelInfo">
+      <div class="model-info-header">
+        <span class="card-label">Model Stats</span>
+        <span class="pill pill-mono">4,000 TF-IDF Features</span>
+      </div>
+      <div id="modelStatsContent" class="model-stats-grid">
+        <div class="stat-card"><div class="stat-val" id="dbTotal">—</div><div class="stat-label">Total in DB</div></div>
+        <div class="stat-card"><div class="stat-val" id="dbFake">—</div><div class="stat-label">Fake Records</div></div>
+        <div class="stat-card"><div class="stat-val" id="dbReal">—</div><div class="stat-label">Real Records</div></div>
+      </div>
+      <div class="top-words-row" id="topWordsRow"></div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Built with <span>Flask · scikit-learn · SQLite · NLTK</span> · Logistic Regression trained on Kaggle dataset</p>
+  </footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
