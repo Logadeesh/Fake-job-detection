@@ -48,13 +48,17 @@ It is built using:
   - `fake_job_model.pkl`
   - `tfidf_vectorizer.pkl`
 
-## ⚠️ Note
-Large files such as model (.pkl), dataset (.csv), and database (.db) are excluded due to GitHub size limits.
+## Dataset
 
-To regenerate:
-1. Run Feature_pipeline.py
-2. This will create model files locally
----
+The dataset file (cleaned_job_posts.csv) is not included due to GitHub size limitations.
+
+To use the project:
+1. Place your dataset in the folder:
+   milestone2_feature_engineering/
+2. Run:
+   python Feature_pipeline.py
+
+This will generate the required model files.
 
 ### 🔹 Milestone 3: Backend (Flask API)
 - Built REST APIs:
